@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aisisea.oa.login.mapper.LoginMapper">
+
+    <sql id="BaseColumnList">
+        emp_id, ac_username, ac_password, ac_authority, ac_remarks
+    </sql>
+
+    <select id="login" resultType="com.aisisea.oa.login.domain.Account">
+        select <include refid="BaseColumnList"/> from account
+        where ac_username = #{acUsername} and ac_password = #{acPassword}
+    </select>
+
+</mapper>

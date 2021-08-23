@@ -1,0 +1,2 @@
+export const CLEAR_LOGIN_MSG = 'CLEAR_LOGIN_MSG';
+export const SET_LOGIN_MSG = 'SET_LOGIN_MSG';

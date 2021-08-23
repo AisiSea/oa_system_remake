@@ -1,0 +1,86 @@
+* {font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;}
+
+.el-button {
+    height: 30px;
+    padding: 0px 20px;
+    border-radius: 2px;
+}
+
+.el-input__inner {
+    border-radius: 2px;
+}
+
+.el-table__body-wrapper {
+    font-size: 16px;
+}
+
+.el-pagination__sizes,
+.el-pagination__total,
+.el-pagination__jump {
+    margin: 0px 10px;
+}
+
+.el-input-group__append, .el-input-group__prepend {
+    background-color: #FFF;
+    color: #909399;
+}
+
+.el-input-group__append:hover, .el-input-group__prepend:hover {
+    color: #606266;
+    transition: .5s;
+}
+
+.el-pagination__editor .el-input__inner {
+    border: none;
+    border-bottom: 1px solid #C0C4CC;
+}
+
+.el-pagination__editor .el-input__inner:hover {
+    border-bottom: 1px solid #909399;
+}
+
+.el-pagination__editor .el-input__inner:focus {
+    border-bottom: 1px solid #409EFF;
+}
+
+.el-pagination__sizes .el-input__inner {
+    border: none;
+}
+
+.el-pagination__sizes .el-input__inner:hover {
+    color: #409EFF;
+}
+
+.el-input-group__append .el-button--default:hover {
+    color: #C0C4CC;
+}
+
+.el-input-group__append .el-button--default:active {
+    color: #409EFF;
+}
+
+.el-dialog__body {
+    padding-top: 0px;
+    padding-bottom: 15px;
+}
+
+.el-divider--horizontal {
+    margin: 10px 0px;
+}
+
+.el-popover {
+    /*width: 250px;*/
+}
+
+.el-popover .el-button {
+    height: 28px;
+    padding: 7px 15px;
+}
+
+.set-button-right {
+    text-align: right;
+}
+
+.el-popover-msg {
+    margin-bottom: 10px;
+}

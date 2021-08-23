@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aisisea.oa.system.employee.mapper.EmployeeMapper">
+
+    <sql id="BaseColumnList">
+        emp_id, emp_name, emp_sex, emp_bir, id_id, id_num, emp_phone, emp_email, dept_id, emp_post, emp_remarks
+    </sql>
+
+    <select id="selectAllEmployees" resultType="com.aisisea.oa.system.employee.domain.Employee">
+        select <include refid="BaseColumnList"/> from employee
+    </select>
+
+</mapper>
