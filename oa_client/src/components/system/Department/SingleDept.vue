@@ -43,6 +43,8 @@ import departmentApi from "@/js/departmentApi";
 export default {
   name: "SingleDept",
 
+  props: ['singleDeptType'],
+
   data() {
     let checkDeptName = (rule, value, callback) => {
       this.axios({
@@ -102,6 +104,7 @@ export default {
 
   methods: {
     cancelClick() {
+      console.log(this.singleDeptType);
       this.$emit('deptSingleClose', false);
     },
 
@@ -110,6 +113,14 @@ export default {
     },
 
     saveClick() {
+      switch (this.singleDeptType) {
+        case 0: this.saveDept(); break;
+        case 1: this.editDept(); break;
+        default: break;
+      }
+    },
+
+    saveDept() {
       this.$refs.singleDeptRef.validate((valid) => {
         if (valid) {
           let departments = [];
@@ -127,6 +138,10 @@ export default {
           });
         } else return false;
       });
+    },
+
+    editDept() {
+
     },
 
     selectVisible() {

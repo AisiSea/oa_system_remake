@@ -3,7 +3,7 @@
     <div class="dept-dialog">
       <el-dialog title="添加单个部门" :visible.sync="deptSingleVisible" :close-on-click-modal="false"
                  :close-on-press-escape="false" :show-close="false" v-if="deptSingleVisible" append-to-body>
-        <SingleDept @deptSingleClose="deptSingleClose"></SingleDept>
+        <SingleDept @deptSingleClose="deptSingleClose" :singleDeptType="singleDeptType"></SingleDept>
       </el-dialog>
       <el-dialog title="批量添加部门" :visible.sync="deptBatchVisible" :close-on-click-modal="false"
                  :close-on-press-escape="false" :show-close="false">
@@ -13,8 +13,10 @@
     <div class="dept-op">
       <el-button type="primary" @click="deptSingleVisible = true">单个添加</el-button>
       <el-button type="primary" @click="deptBatchVisible = true">批量添加</el-button>
-      <el-button type="success" @click="refreshClick">刷新页面</el-button>
       <el-button type="danger" @click="batchDelClick">批量删除</el-button>
+      <el-button type="success" @click="refreshClick">刷新页面</el-button>
+      <el-button @click="refreshClick">批量导入</el-button>
+      <el-button @click="refreshClick">批量导出</el-button>
       <el-input class="dept-search" v-model="valueInput" placeholder="支持模糊查询" size="small" clearable>
         <el-select class="search-select" v-model="searchName" slot="prepend">
           <el-option label="部门名称" value="0"></el-option>
@@ -79,7 +81,8 @@ export default {
       orderTy: 'desc',
       currentPage: 1,
       pageSize: 12,
-      selection: null
+      selection: null,
+      singleDeptType: 1024
     }
   },
 
