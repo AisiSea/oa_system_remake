@@ -11,7 +11,7 @@
       <el-form-item prop="deptLocal" label="部门地址">
         <el-input size="small" placeholder="选填 | 100 个字符以内" v-model="department.deptLocal"></el-input>
       </el-form-item>
-      <el-form-item label="父级部门">
+      <el-form-item label="父级部门" prop="deptParent">
         <el-select v-model="department.deptParent" size="small" class="parent-select" placeholder="搜索" filterable>
           <el-option v-for="item in deptNames" :label="item.deptName" :key="item.deptId"
                      :value="item.deptId"></el-option>
@@ -63,10 +63,13 @@ export default {
 
     return {
       department: {
-        deptName: '上海销售部',
-        deptPhone: '30624770',
+        // deptName: '上海销售部',
+        // deptPhone: '30624770',
+        deptName: '',
+        deptPhone: '',
         deptParent: '',
-        deptLocal: '上海浦东区迪士尼度假区正门售票处',
+        // deptLocal: '上海浦东区迪士尼度假区正门售票处',
+        deptLocal: '',
         deptRemarks: '',
       },
       visible: false,
