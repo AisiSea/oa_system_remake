@@ -13,8 +13,8 @@
     <div class="dept-op">
       <el-button type="primary" @click="deptSingleVisible = true">单个添加</el-button>
       <el-button type="primary" @click="deptBatchVisible = true">批量添加</el-button>
-      <el-button type="success" @click="deptRefresh">刷新页面</el-button>
-      <el-button type="danger">批量删除</el-button>
+      <el-button type="success" @click="refreshClick">刷新页面</el-button>
+      <el-button type="danger" @click="batchDelClick">批量删除</el-button>
       <el-input class="dept-search" v-model="valueInput" placeholder="支持模糊查询" size="small" clearable>
         <el-select class="search-select" v-model="searchName" slot="prepend">
           <el-option label="部门名称" value="0"></el-option>
@@ -26,7 +26,7 @@
       </el-input>
     </div>
     <div class="dept-table">
-      <el-table id="table" :data="deptData" :height=TABLE_DEFAULT_HEIGHT v-loading="loading"
+      <el-table id="table" :data="deptData" :height=TABLE_DEFAULT_HEIGHT v-loading="loading" @selection-change="selectionChange"
                 @row-dblclick="rowDblClick" @sort-change="sortChange" :default-sort="{prop: 'deptName', order: 'descending'}">
         <el-table-column prop="deptName" label="部门名称" sortable="custom" :sort-orders="sortOrders" :index="0" :width=TABLE_BASE_WIDTH></el-table-column>
         <el-table-column prop="deptPhone" label="联系方式" sortable="custom" :sort-orders="sortOrders" :index="1" :width=TABLE_BASE_WIDTH></el-table-column>
@@ -35,7 +35,7 @@
         <el-table-column prop="" label="操作" :width=TABLE_MEDIUM_WIDTH>
           <template slot-scope="scope">
             <el-button type="primary">编辑</el-button>
-            <el-button type="danger" @click="deleteClick(scope.$index)">删除</el-button>
+            <el-button type="danger" size="mini" @click="deleteClick(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
         <el-table-column type="selection" :width=TABLE_EXTRA_SMALL_WIDTH></el-table-column>
@@ -44,7 +44,7 @@
     <div class="dept-page">
       <el-pagination layout="sizes, prev, pager, next, total, jumper" :page-sizes="[12, 25, 50]"
                      :page-size="pageSize" :total="deptDataCount" @size-change="sizeChange"
-                     @current-change="currentChange"></el-pagination>
+                     @current-change="currentChange" :current-page="currentPage"></el-pagination>
     </div>
   </div>
 </template>
@@ -74,7 +74,12 @@ export default {
       sortOrders: ['ascending', 'descending'],
       deptSingleVisible: false,
       deptBatchVisible: false,
-      pageSize: 12
+      deptDelVisible: false,
+      orderCol: '0',
+      orderTy: 'desc',
+      currentPage: 1,
+      pageSize: 12,
+      selection: null
     }
   },
 
@@ -115,15 +120,18 @@ export default {
       });
     },
 
-    deleteDepartments(indexes) {
-      if (!Array.isArray(indexes))
+    deleteDepartments(deptIds) {
+      if (!Array.isArray(deptIds))
         return;
       this.axios({
         url: departmentApi.department.delDept,
         method: 'POST',
-        data: indexes
+        data: deptIds
       }).then(res => {
-        console.log(res);
+        if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
+          this.$message.success(res.data.msg);
+          this.getDepartments(this.currentPage, this.searchName, this.searchValue, this.orderCol, this.orderTy);
+        }
       });
     },
 
@@ -134,18 +142,34 @@ export default {
 
     currentChange(current) {
       this.getDepartments(current, this.searchName, this.searchValue);
+      this.currentPage = current;
     },
 
     sortChange({ column, order }){
-      let orderCol = column.index.toString();
-      let orderTy = 'asc';
+      this.orderCol = column.index.toString();
+      this.orderTy = 'asc';
       if (order === 'descending')
-        orderTy = 'desc';
-      this.getDepartments(1, this.searchName, this.searchValue, orderCol, orderTy);
+        this.orderTy = 'desc';
+      this.getDepartments(1, this.searchName, this.searchValue, this.orderCol, this.orderTy);
     },
 
-    deptRefresh() {
+    selectionChange(selection) {
+      this.selection = selection;
+    },
+
+    refreshClick() {
       this.$router.go(0);
+    },
+
+    batchDelClick(){
+      let deptIds = [];
+      let deptNames = [];
+      this.selection.forEach(function (item) {
+        deptIds.push(item.deptId);
+        deptNames.push('【 ' + item.deptName + ' 】');
+      });
+      if (confirm('确定要删除以下部门吗？该操作不可逆\n' + deptNames))
+        this.deleteDepartments(deptIds);
     },
 
     searchClick() {
@@ -160,7 +184,9 @@ export default {
     },
 
     deleteClick(index){
-      this.deleteDepartments([this.deptData[index].deptId]);
+      let deptName = this.deptData[index].deptName;
+      if (confirm('确定要删除 【 ' + deptName + ' 】 吗？该操作不可逆'))
+        this.deleteDepartments([this.deptData[index].deptId]);
     },
 
     deptSingleClose(isSuccess) {

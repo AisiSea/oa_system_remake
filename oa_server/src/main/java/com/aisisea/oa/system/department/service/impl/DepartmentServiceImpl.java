@@ -34,4 +34,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public int queryDepartmentsIsExist(List<String> deptNames) {
         return departmentMapper.selectDepartmentsIsExist(deptNames);
     }
+
+    @Override
+    public int deleteDepartments(List<String> deptIds) {
+        return departmentMapper.deleteDepartments(deptIds);
+    }
 }

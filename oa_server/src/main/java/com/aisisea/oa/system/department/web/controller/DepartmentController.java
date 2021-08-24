@@ -150,9 +150,16 @@ public class DepartmentController {
 
     @ResponseBody
     @RequestMapping(value = "/system/dept/del", method = RequestMethod.POST)
-    public Object deleteDepartments(@RequestBody List<String> deptId) {
-
-        return DefaultReturnObject.getSuccessReturnObject(null);
+    public Object deleteDepartments(@RequestBody List<String> deptIds) {
+        if (deptIds.size() <= 0)
+            return DefaultReturnObject.getErrorParamReturnObject(null);
+        int count = departmentService.deleteDepartments(deptIds);
+        if (count > 0) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("count", count);
+            return DefaultReturnObject.getSuccessReturnObject(resultMap);
+        }
+        return DefaultReturnObject.getErrorParamReturnObject(null);
     }
 
 }

@@ -15,4 +15,6 @@ public interface DepartmentService {
 
     int queryDepartmentsIsExist(List<String> deptNames);
 
+    int deleteDepartments(List<String> deptIds);
+
 }

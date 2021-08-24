@@ -49,4 +49,9 @@
         dept_name in(<foreach collection="list" item="name" separator=",">#{name}</foreach>)
     </select>
 
+    <delete id="deleteDepartments">
+        delete from department where dept_id
+        in (<foreach collection="list" item="id" separator=",">#{id}</foreach>)
+    </delete>
+
 </mapper>
