@@ -25,9 +25,12 @@
         on d1.dept_parent = d2.dept_id
         <where>
             <if test="keyName != null and keyName != '' and keyValue != null and keyValue != ''">
-                ${keyName} like concat('%', #{keyValue}, '%')
+                <if test="keyName == 'dept_parent'">d2.dept_name</if>
+                <if test="keyName != 'dept_parent'">d1.${keyName}</if>
+                like concat('%', #{keyValue}, '%')
             </if>
         </where>
+        order by d1.${orderCol} ${orderTy}
     </select>
 
     <select id="selectDepartmentsNames" resultType="map">

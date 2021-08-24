@@ -102,11 +102,11 @@ export default {
 
   methods: {
     cancelClick() {
-      this.$emit('deptSingleClose');
+      this.$emit('deptSingleClose', false);
     },
 
     closeSingleDept() {
-      this.$emit('deptSingleClose');
+      this.$emit('deptSingleClose', true);
     },
 
     saveClick() {

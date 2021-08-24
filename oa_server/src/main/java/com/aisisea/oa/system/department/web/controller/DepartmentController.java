@@ -45,10 +45,10 @@ public class DepartmentController {
     }
 
     private boolean checkOffsetAndCount(Map<String, Object> map) {
-        String index = (String) map.get("keyName");
-        if (index != null && !index.equals("")) {
+        String keyName = (String) map.get("keyName");
+        if (keyName != null && !keyName.equals("")) {
             try {
-                int i = Integer.parseInt(index);
+                int i = Integer.parseInt(keyName);
                 if (i >= 0 && i < KeyNameConstants.deptKeyName.length)
                     map.put("keyName", KeyNameConstants.deptKeyName[i]);
                 else return false;
@@ -58,12 +58,31 @@ public class DepartmentController {
             }
         }
 
+        String order = (String) map.get("orderTy");
+        if (order == null || order.equals(""))
+            map.put("orderTy", "desc");
+        else {
+            order = order.toLowerCase();
+            if (!order.equals("asc") && !order.equals("desc"))
+                map.put("orderTy", "desc");
+        }
+
+        String orderCol = (String) map.get("orderCol");
+        if (orderCol != null && !orderCol.equals("")) {
+            try {
+                int i = Integer.parseInt(orderCol);
+                if (i >= 0 && i < KeyNameConstants.deptKeyName.length)
+                    map.put("orderCol", KeyNameConstants.deptKeyName[i]);
+                else map.put("orderCol", KeyNameConstants.deptKeyName[0]);
+            } catch (NumberFormatException e) { e.printStackTrace(); }
+        } else map.put("orderCol", KeyNameConstants.deptKeyName[0]);
+
         Integer offset = (Integer) map.get("offset");
         Integer count = (Integer) map.get("count");
 
         if (count == null || offset == null)
             return false;
-        else if (offset < 0 || count <= 0)
+        else if (offset <= 0 || count <= 0)
             return false;
         return true;
     }
@@ -127,6 +146,13 @@ public class DepartmentController {
             resultMap.put("isExist", true);
         else resultMap.put("isExist", false);
         return DefaultReturnObject.getSuccessReturnObject(resultMap);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/system/dept/del", method = RequestMethod.POST)
+    public Object deleteDepartments(@RequestBody List<String> deptId) {
+
+        return DefaultReturnObject.getSuccessReturnObject(null);
     }
 
 }

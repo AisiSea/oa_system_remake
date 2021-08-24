@@ -15,8 +15,8 @@
       <el-button type="primary" @click="deptBatchVisible = true">批量添加</el-button>
       <el-button type="success" @click="deptRefresh">刷新页面</el-button>
       <el-button type="danger">批量删除</el-button>
-      <el-input class="dept-search" v-model="searchKey" placeholder="支持模糊查询" size="small" clearable>
-        <el-select class="search-select" v-model="searchSelect" slot="prepend">
+      <el-input class="dept-search" v-model="valueInput" placeholder="支持模糊查询" size="small" clearable>
+        <el-select class="search-select" v-model="searchName" slot="prepend">
           <el-option label="部门名称" value="0"></el-option>
           <el-option label="联系方式" value="1"></el-option>
           <el-option label="父级部门" value="2"></el-option>
@@ -26,15 +26,16 @@
       </el-input>
     </div>
     <div class="dept-table">
-      <el-table id="table" :data="deptData" :height=TABLE_DEFAULT_HEIGHT  v-loading="loading">
-        <el-table-column prop="deptName" label="部门名称" sortable :width=TABLE_BASE_WIDTH></el-table-column>
-        <el-table-column prop="deptPhone" label="联系方式" sortable :width=TABLE_BASE_WIDTH></el-table-column>
-        <el-table-column prop="deptParent" label="父级部门" sortable :width=TABLE_BASE_WIDTH></el-table-column>
-        <el-table-column prop="deptLocal" label="部门地址" sortable :width=TABLE_EXTRA_LARGE_WIDTH></el-table-column>
+      <el-table id="table" :data="deptData" :height=TABLE_DEFAULT_HEIGHT v-loading="loading"
+                @row-dblclick="rowDblClick" @sort-change="sortChange" :default-sort="{prop: 'deptName', order: 'descending'}">
+        <el-table-column prop="deptName" label="部门名称" sortable="custom" :sort-orders="sortOrders" :index="0" :width=TABLE_BASE_WIDTH></el-table-column>
+        <el-table-column prop="deptPhone" label="联系方式" sortable="custom" :sort-orders="sortOrders" :index="1" :width=TABLE_BASE_WIDTH></el-table-column>
+        <el-table-column prop="deptParent" label="父级部门" sortable="custom" :sort-orders="sortOrders" :index="2" :width=TABLE_BASE_WIDTH></el-table-column>
+        <el-table-column prop="deptLocal" label="部门地址" sortable="custom" :sort-orders="sortOrders" :index="3" :width=TABLE_EXTRA_LARGE_WIDTH></el-table-column>
         <el-table-column prop="" label="操作" :width=TABLE_MEDIUM_WIDTH>
-          <template>
+          <template slot-scope="scope">
             <el-button type="primary">编辑</el-button>
-            <el-button type="danger">删除</el-button>
+            <el-button type="danger" @click="deleteClick(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
         <el-table-column type="selection" :width=TABLE_EXTRA_SMALL_WIDTH></el-table-column>
@@ -42,7 +43,8 @@
     </div>
     <div class="dept-page">
       <el-pagination layout="sizes, prev, pager, next, total, jumper" :page-sizes="[12, 25, 50]"
-                     :page-size="pageSize" :total="deptDataCount" @size-change="sizeChange"></el-pagination>
+                     :page-size="pageSize" :total="deptDataCount" @size-change="sizeChange"
+                     @current-change="currentChange"></el-pagination>
     </div>
   </div>
 </template>
@@ -65,9 +67,11 @@ export default {
     return {
       loading: true,
       deptData: [],
-      deptDataCount: 0,
-      searchKey: '',
-      searchSelect: '0',
+      deptDataCount: 1,
+      valueInput: '',
+      searchValue: '',
+      searchName: '0',
+      sortOrders: ['ascending', 'descending'],
       deptSingleVisible: false,
       deptBatchVisible: false,
       pageSize: 12
@@ -83,15 +87,24 @@ export default {
   },
 
   methods: {
-    getDepartments(keyName, keyValue) {
+    getDepartments(offset, keyName, keyValue, orderCol, orderTy) {
+      if (offset === undefined || offset === null)
+        offset = 1;
+      else if (typeof offset !== typeof 'number')
+        offset = Number.parseInt(offset);
+      if (offset <= 1)
+        offset = 1;
+
       this.axios({
         url: departmentApi.department.getDept,
         method: 'POST',
         data: {
-          offset: 0,
+          offset: Number.parseInt(offset),
           count: this.pageSize,
           keyName: keyName,
-          keyValue: keyValue
+          keyValue: keyValue,
+          orderCol: orderCol,
+          orderTy: orderTy
         }
       }).then(res => {
         if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
@@ -102,9 +115,33 @@ export default {
       });
     },
 
+    deleteDepartments(indexes) {
+      if (!Array.isArray(indexes))
+        return;
+      this.axios({
+        url: departmentApi.department.delDept,
+        method: 'POST',
+        data: indexes
+      }).then(res => {
+        console.log(res);
+      });
+    },
+
     sizeChange(size) {
       this.pageSize = size;
-      this.getDepartments(this.searchSelect, this.searchKey);
+      this.getDepartments(1, this.searchName, this.searchValue);
+    },
+
+    currentChange(current) {
+      this.getDepartments(current, this.searchName, this.searchValue);
+    },
+
+    sortChange({ column, order }){
+      let orderCol = column.index.toString();
+      let orderTy = 'asc';
+      if (order === 'descending')
+        orderTy = 'desc';
+      this.getDepartments(1, this.searchName, this.searchValue, orderCol, orderTy);
     },
 
     deptRefresh() {
@@ -112,10 +149,23 @@ export default {
     },
 
     searchClick() {
-      this.getDepartments(this.searchSelect, this.searchKey);
+      this.searchValue = this.valueInput;
+      this.getDepartments(1, this.searchName, this.searchValue);
     },
 
-    deptSingleClose() {
+    rowDblClick(row, column, event) {
+      console.log('row: ' + row);
+      console.log('column: ' + column);
+      console.log('event: ' + event);
+    },
+
+    deleteClick(index){
+      this.deleteDepartments([this.deptData[index].deptId]);
+    },
+
+    deptSingleClose(isSuccess) {
+      if (isSuccess)
+        this.getDepartments(0);
       this.deptSingleVisible = false;
     },
 
