@@ -25,7 +25,7 @@
         </el-menu-item>
       </el-submenu>
     </el-menu>
-    <router-view></router-view>
+    <router-view style="min-height: 800px"></router-view>
   </div>
 </template>
 
@@ -63,6 +63,7 @@ export default {
   .el-menu {
     width: @leftBarWidth;
     height: @totalHeight;
+    min-height: 800px;
     box-shadow: @boxShadowSetter;
   }
 }
