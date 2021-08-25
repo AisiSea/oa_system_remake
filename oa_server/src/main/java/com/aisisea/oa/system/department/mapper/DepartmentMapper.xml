@@ -43,7 +43,7 @@
     </select>
     
     <select id="selectChildDepartmentCount" resultType="java.lang.Integer">
-        select count(*) from department where dept_id in 
+        select count(*) from department where dept_parent in
         (<foreach collection="list" item="id" separator=",">#{id}</foreach>)
     </select>
 

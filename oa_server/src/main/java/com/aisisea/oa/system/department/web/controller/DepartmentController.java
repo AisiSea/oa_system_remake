@@ -153,7 +153,7 @@ public class DepartmentController {
         if (deptIds.size() <= 0)
             return DefaultReturnObject.getErrorParamReturnObject(null);
         if (departmentService.queryChildDepartmentCount(deptIds) > 0)
-            return DefaultReturnObject.getErrorParamReturnObject("该部门存在子部门，删除失败", null);
+            return DefaultReturnObject.getErrorParamReturnObject("选中部门存在子部门，删除失败", null);
 
         int count = departmentService.deleteDepartments(deptIds);
         if (count > 0) {
@@ -200,5 +200,7 @@ public class DepartmentController {
         }
         return true;
     }
+
+
 
 }
