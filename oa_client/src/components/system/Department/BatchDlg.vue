@@ -18,11 +18,11 @@ export default {
 
   methods: {
     cancelClick() {
-      this.$emit('deptBatchClose');
+      this.$emit('batchClose');
     },
 
     okClick() {
-      this.$emit('deptBatchClose');
+      this.$emit('batchClose');
     }
   }
 }

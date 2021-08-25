@@ -1,5 +1,5 @@
 <template>
-  <div class="addSingleDept">
+  <div class="singleDlg">
     <el-divider></el-divider>
     <el-form :model="department" :inline="true" :rules="deptRules" ref="singleDeptRef" label-width="100px">
       <el-form-item prop="deptName" label="部门名称">
@@ -43,11 +43,11 @@ import departmentApi from "@/js/departmentApi";
 export default {
   name: "SingleDept",
 
-  props: ['singleDeptType', 'toEditDept'],
+  props: ['singleDlgType', 'sourceData'],
 
   data() {
     let checkDeptName = (rule, value, callback) => {
-      if (this.singleDeptType === 1)
+      if (this.singleDlgType === 1)
         callback();
       this.axios({
         method: 'POST',
@@ -103,21 +103,21 @@ export default {
 
   mounted() {
     this.selectVisible();
-    if (this.toEditDept !== undefined && this.toEditDept !== null)
-      this.department = Object.assign({}, this.toEditDept);
+    if (this.sourceData !== undefined && this.sourceData !== null)
+      this.department = Object.assign({}, this.sourceData);
   },
 
   methods: {
     cancelClick() {
-      this.$emit('deptSingleClose', false);
+      this.$emit('singleClose', false);
     },
 
     closeSingleDept() {
-      this.$emit('deptSingleClose', true);
+      this.$emit('singleClose', true);
     },
 
     saveClick() {
-      switch (this.singleDeptType) {
+      switch (this.singleDlgType) {
         case 0: this.saveDept(); break;
         case 1: this.editDept(); break;
         default: break;
@@ -169,9 +169,9 @@ export default {
       }).then((res) => {
         if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
           this.deptNames = res.data.data.deptNames;
-          if (this.singleDeptType === 1)
+          if (this.singleDlgType === 1)
             this.department.deptParent = this.deptNames.find(item => {
-              return item.deptName === this.toEditDept.deptParent;
+              return item.deptName === this.sourceData.deptParent;
             }).deptId;
         } else this.$message.error(res.data.msg);
       });
@@ -184,7 +184,7 @@ export default {
 <style lang="less" scoped>
 @import "~@/styles/size";
 
-.addSingleDept {
+.singleDlg {
   .el-input,
   .parent-select {
     width: 300px;
