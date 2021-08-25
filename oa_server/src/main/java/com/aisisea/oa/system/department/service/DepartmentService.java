@@ -17,4 +17,6 @@ public interface DepartmentService {
 
     int deleteDepartments(List<String> deptIds);
 
+    int editDepartment(Department department);
+
 }

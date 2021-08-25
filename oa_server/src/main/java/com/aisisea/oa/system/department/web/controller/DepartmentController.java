@@ -126,7 +126,6 @@ public class DepartmentController {
         int count = departmentService.queryDepartmentsIsExist(deptNames);
         if (count > 0)
             return false;
-
         return true;
     }
 
@@ -160,6 +159,39 @@ public class DepartmentController {
             return DefaultReturnObject.getSuccessReturnObject(resultMap);
         }
         return DefaultReturnObject.getErrorParamReturnObject(null);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/system/dept/put", method = RequestMethod.POST)
+    public Object editDepartment(@RequestBody Department department) {
+        if (!checkDepartment(department))
+            return DefaultReturnObject.getErrorParamReturnObject(null);
+
+        int count = departmentService.editDepartment(department);
+        if (count > 0) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("count", count);
+            return DefaultReturnObject.getSuccessReturnObject(resultMap);
+        }
+        return DefaultReturnObject.getErrorParamReturnObject(null);
+    }
+
+    public boolean checkDepartment(Department department) {
+        if (department.getDeptId() <= 1000)
+            return false;
+
+        try {
+            String parent = department.getDeptParent();
+            if (parent == null || parent.equals(""))
+                return false;
+            int parentId = Integer.parseInt(parent);
+            if (parentId < 1000)
+                return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 }

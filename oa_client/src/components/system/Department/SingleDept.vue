@@ -43,10 +43,12 @@ import departmentApi from "@/js/departmentApi";
 export default {
   name: "SingleDept",
 
-  props: ['singleDeptType'],
+  props: ['singleDeptType', 'toEditDept'],
 
   data() {
     let checkDeptName = (rule, value, callback) => {
+      if (this.singleDeptType === 1)
+        callback();
       this.axios({
         method: 'POST',
         url: departmentApi.department.checkName,
@@ -67,6 +69,7 @@ export default {
       department: {
         // deptName: '上海销售部',
         // deptPhone: '30624770',
+        deptId: '',
         deptName: '',
         deptPhone: '',
         deptParent: '',
@@ -100,11 +103,12 @@ export default {
 
   mounted() {
     this.selectVisible();
+    if (this.toEditDept !== undefined && this.toEditDept !== null)
+      this.department = Object.assign({}, this.toEditDept);
   },
 
   methods: {
     cancelClick() {
-      console.log(this.singleDeptType);
       this.$emit('deptSingleClose', false);
     },
 
@@ -141,7 +145,21 @@ export default {
     },
 
     editDept() {
-
+      this.$refs.singleDeptRef.validate((valid) => {
+        if (valid) {
+          this.axios({
+            method: 'POST',
+            url: departmentApi.department.editDept,
+            data: this.department
+          }).then((res) => {
+            if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
+              this.$message.success(res.data.msg);
+              this.closeSingleDept();
+            } else
+              this.$message.error(res.data.msg);
+          });
+        } else return false;
+      });
     },
 
     selectVisible() {
@@ -149,9 +167,14 @@ export default {
         method: 'POST',
         url: departmentApi.department.getNames,
         data: {},
+        async: false
       }).then((res) => {
         if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
           this.deptNames = res.data.data.deptNames;
+          if (this.singleDeptType === 1)
+            this.department.deptParent = this.deptNames.find(item => {
+              return item.deptName === this.toEditDept.deptParent;
+            }).deptId;
         }
       });
     }

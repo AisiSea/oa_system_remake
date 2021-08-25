@@ -1,9 +1,9 @@
 <template>
   <div class="dept">
     <div class="dept-dialog">
-      <el-dialog title="添加单个部门" :visible.sync="deptSingleVisible" :close-on-click-modal="false"
+      <el-dialog :title="singleTitle" :visible.sync="deptSingleVisible" :close-on-click-modal="false"
                  :close-on-press-escape="false" :show-close="false" v-if="deptSingleVisible" append-to-body>
-        <SingleDept @deptSingleClose="deptSingleClose" :singleDeptType="singleDeptType"></SingleDept>
+        <SingleDept @deptSingleClose="deptSingleClose" :singleDeptType="singleDeptType" :toEditDept="toEditDept"></SingleDept>
       </el-dialog>
       <el-dialog title="批量添加部门" :visible.sync="deptBatchVisible" :close-on-click-modal="false"
                  :close-on-press-escape="false" :show-close="false">
@@ -11,7 +11,7 @@
       </el-dialog>
     </div>
     <div class="dept-op">
-      <el-button type="primary" @click="deptSingleVisible = true">单个添加</el-button>
+      <el-button type="primary" @click="singleClick">单个添加</el-button>
       <el-button type="primary" @click="deptBatchVisible = true">批量添加</el-button>
       <el-button type="danger" @click="batchDelClick">批量删除</el-button>
       <el-button type="success" @click="refreshClick">刷新页面</el-button>
@@ -36,7 +36,7 @@
         <el-table-column prop="deptLocal" label="部门地址" sortable="custom" :sort-orders="sortOrders" :index="3" :width=TABLE_EXTRA_LARGE_WIDTH></el-table-column>
         <el-table-column prop="" label="操作" :width=TABLE_MEDIUM_WIDTH>
           <template slot-scope="scope">
-            <el-button type="primary">编辑</el-button>
+            <el-button type="primary" @click="editClick(scope.$index)">编辑</el-button>
             <el-button type="danger" size="mini" @click="deleteClick(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
@@ -82,7 +82,9 @@ export default {
       currentPage: 1,
       pageSize: 12,
       selection: null,
-      singleDeptType: 1024
+      singleDeptType: 0,
+      singleTitle: '',
+      toEditDept: null
     }
   },
 
@@ -158,6 +160,20 @@ export default {
 
     selectionChange(selection) {
       this.selection = selection;
+    },
+
+    singleClick() {
+      this.singleTitle = '添加单个部门';
+      this.singleDeptType = 0;
+      this.toEditDept = null;
+      this.deptSingleVisible = true;
+    },
+
+    editClick(index) {
+      this.singleTitle = '编辑部门';
+      this.singleDeptType = 1;
+      this.toEditDept = this.deptData[index];
+      this.deptSingleVisible = true;
     },
 
     refreshClick() {

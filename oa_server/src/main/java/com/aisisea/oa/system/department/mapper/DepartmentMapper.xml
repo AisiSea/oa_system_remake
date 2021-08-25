@@ -54,4 +54,16 @@
         in (<foreach collection="list" item="id" separator=",">#{id}</foreach>)
     </delete>
 
+    <update id="editDepartment">
+        update department
+        <set>
+            <if test="deptName != null and deptName != ''">dept_name = #{deptName},</if>
+            <if test="deptParent != null and deptParent != ''">dept_parent = #{deptParent},</if>
+            <if test="deptPhone != null">dept_phone = #{deptPhone},</if>
+            <if test="deptLocal != null">dept_local = #{deptLocal},</if>
+            <if test="deptRemarks != null">dept_remarks = #{deptRemarks},</if>
+        </set>
+        where dept_id = #{deptId}
+    </update>
+
 </mapper>

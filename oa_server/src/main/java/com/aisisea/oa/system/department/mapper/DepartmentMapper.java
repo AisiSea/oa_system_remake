@@ -16,4 +16,6 @@ public interface DepartmentMapper {
     int selectDepartmentsIsExist(List<String> deptNames);
 
     int deleteDepartments(List<String> deptIds);
+
+    int editDepartment(Department department);
 }
