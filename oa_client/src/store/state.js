@@ -10,7 +10,7 @@ export default {
     TABLE_LARGE_WIDTH: 300,
     TABLE_EXTRA_LARGE_WIDTH: 600,
 
-    TABLE_DEFAULT_HEIGHT: 55 * 12 + 59,
+    TABLE_DEFAULT_HEIGHT: 56 * 12 + 59,
 
     loginMsg: ''
 

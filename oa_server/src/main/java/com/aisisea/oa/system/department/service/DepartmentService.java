@@ -19,4 +19,8 @@ public interface DepartmentService {
 
     int editDepartment(Department department);
 
+    int queryChildDepartmentCount(List<String> deptIds);
+
+    String queryDepartmentParentId(String deptId);
+
 }

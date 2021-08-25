@@ -15,7 +15,6 @@
       <el-button type="primary" @click="deptBatchVisible = true">批量添加</el-button>
       <el-button type="danger" @click="batchDelClick">批量删除</el-button>
       <el-button type="success" @click="refreshClick">刷新页面</el-button>
-      <el-button @click="refreshClick">批量导入</el-button>
       <el-button @click="refreshClick">批量导出</el-button>
       <el-input class="dept-search" v-model="valueInput" placeholder="支持模糊查询" size="small" clearable>
         <el-select class="search-select" v-model="searchName" slot="prepend">
@@ -121,7 +120,7 @@ export default {
           this.deptData = res.data.data.departments;
           this.deptDataCount = res.data.data.total;
           this.loading = false;
-        }
+        } else this.$message.error(res.data.msg);
       });
     },
 
@@ -136,7 +135,7 @@ export default {
         if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
           this.$message.success(res.data.msg);
           this.getDepartments(this.currentPage, this.searchName, this.searchValue, this.orderCol, this.orderTy);
-        }
+        } else this.$message.error(res.data.msg);
       });
     },
 

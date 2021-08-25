@@ -152,6 +152,9 @@ public class DepartmentController {
     public Object deleteDepartments(@RequestBody List<String> deptIds) {
         if (deptIds.size() <= 0)
             return DefaultReturnObject.getErrorParamReturnObject(null);
+        if (departmentService.queryChildDepartmentCount(deptIds) > 0)
+            return DefaultReturnObject.getErrorParamReturnObject("该部门存在子部门，删除失败", null);
+
         int count = departmentService.deleteDepartments(deptIds);
         if (count > 0) {
             Map<String, Object> resultMap = new HashMap<>();
@@ -166,6 +169,10 @@ public class DepartmentController {
     public Object editDepartment(@RequestBody Department department) {
         if (!checkDepartment(department))
             return DefaultReturnObject.getErrorParamReturnObject(null);
+        String grandparentId = departmentService.queryDepartmentParentId(department.getDeptParent());
+        String deptId = String.valueOf(department.getDeptId());
+        if (deptId.equals(grandparentId))
+            return DefaultReturnObject.getErrorParamReturnObject("不能互为父级部门，保存失败", null);
 
         int count = departmentService.editDepartment(department);
         if (count > 0) {

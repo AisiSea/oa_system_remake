@@ -44,4 +44,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     public int editDepartment(Department department) {
         return departmentMapper.editDepartment(department);
     }
+
+    @Override
+    public int queryChildDepartmentCount(List<String> deptIds) {
+        return departmentMapper.selectChildDepartmentCount(deptIds);
+    }
+
+    @Override
+    public String queryDepartmentParentId(String deptId) {
+        return departmentMapper.selectDepartmentParentId(deptId);
+    }
 }

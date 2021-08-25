@@ -18,4 +18,8 @@ public interface DepartmentMapper {
     int deleteDepartments(List<String> deptIds);
 
     int editDepartment(Department department);
+
+    int selectChildDepartmentCount(List<String> deptIds);
+
+    String selectDepartmentParentId(String deptId);
 }

@@ -137,8 +137,7 @@ export default {
             if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
               this.$message.success(res.data.msg);
               this.closeSingleDept();
-            } else
-              this.$message.error(res.data.msg);
+            } else this.$message.error(res.data.msg);
           });
         } else return false;
       });
@@ -155,8 +154,7 @@ export default {
             if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
               this.$message.success(res.data.msg);
               this.closeSingleDept();
-            } else
-              this.$message.error(res.data.msg);
+            } else this.$message.error(res.data.msg);
           });
         } else return false;
       });
@@ -175,7 +173,7 @@ export default {
             this.department.deptParent = this.deptNames.find(item => {
               return item.deptName === this.toEditDept.deptParent;
             }).deptId;
-        }
+        } else this.$message.error(res.data.msg);
       });
     }
   }

@@ -30,7 +30,7 @@ export default {
             }
         }).then(res => {
             if (res.data.state !== vueObj.$store.state.SUCCESS_RESPONSE_STATE)
-                this.pushToLogin(vueObj, '登录状态异常');
+                this.pushToLogin(vueObj, '登录过期或无效');
         });
     }
 }
