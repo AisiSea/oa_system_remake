@@ -1,11 +1,17 @@
 package com.aisisea.oa.system.department.web.controller;
 
 import com.aisisea.oa.commons.contants.KeyNameConstants;
+import com.aisisea.oa.commons.contants.ParamTranslationMap;
+import com.aisisea.oa.commons.utils.AsListUtils;
 import com.aisisea.oa.commons.utils.DefaultReturnObject;
 import com.aisisea.oa.system.department.domain.Department;
 import com.aisisea.oa.system.department.service.DepartmentService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,10 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.net.URLEncoder;
+import java.util.*;
 
 @Controller
 public class DepartmentController {
@@ -111,6 +118,8 @@ public class DepartmentController {
     }
 
     private boolean checkDepartments(List<Department> departments) {
+        if (departments == null)
+            return false;
         List<String> deptNames = new ArrayList<>();
         for (int i = 0; i < departments.size(); i++) {
             Department department = departments.get(i);
@@ -184,7 +193,7 @@ public class DepartmentController {
     }
 
     public boolean checkDepartment(Department department) {
-        if (department.getDeptId() <= 1000)
+        if (department == null || department.getDeptId() <= 1000)
             return false;
 
         try {
@@ -201,6 +210,62 @@ public class DepartmentController {
         return true;
     }
 
+    @RequestMapping(value = "/system/dept/get/xlsx", method = RequestMethod.POST)
+    public void queryDepartmentsToExcel(@RequestBody List<String> deptIds, HttpServletResponse response) {
+        List<Department> list;
+        if (deptIds != null && deptIds.size() > 0)
+            list = departmentService.queryDepartmentsByIds(deptIds);
+        else list = departmentService.queryDepartmentsByIds(null);
 
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("部门导出表");
+
+        Field[] fields = Department.class.getDeclaredFields();
+        List<Field> fieldList = AsListUtils.asList(fields);
+        XSSFRow titleRow = sheet.createRow(0);
+
+        int columnIndex = 0;
+        Iterator<Field> iterator = fieldList.iterator();
+        while (iterator.hasNext()) {
+            String name = iterator.next().getName();
+            if (name.equals("deptId"))
+                iterator.remove();
+            else {
+                XSSFCell cell = titleRow.createCell(columnIndex);
+                cell.setCellValue(ParamTranslationMap.DEPT.get(name));
+                columnIndex++;
+            }
+        }
+
+        OutputStream outputStream = null;
+        try {
+            for (int i = 0; i < list.size(); i++) {
+                XSSFRow row = sheet.createRow(i + 1);
+                for (int n = 0; n < fieldList.size(); n++) {
+                    Field field = fieldList.get(n);
+                    field.setAccessible(true);
+                    String value = (String) field.get(list.get(i));
+                    XSSFCell cell = row.createCell(n);
+                    cell.setCellValue(value);
+                }
+            }
+
+            response.setContentType("application/octet-stream;charset=UTF-8");
+            String fileName = URLEncoder.encode("市场活动表.xlsx", "UTF-8");
+            response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+            outputStream = response.getOutputStream();
+            workbook.write(outputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (outputStream != null)
+                    outputStream.close();
+                workbook.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

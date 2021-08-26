@@ -22,4 +22,6 @@ public interface DepartmentMapper {
     int selectChildDepartmentCount(List<String> deptIds);
 
     String selectDepartmentParentId(String deptId);
+
+    List<Department> selectDepartmentsByIds(List<String> deptIds);
 }

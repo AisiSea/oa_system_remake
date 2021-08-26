@@ -11,7 +11,7 @@ public class Department {
      */
 
     private int deptId;
-    private String deptName, deptPhone, deptLocal, deptRemarks, deptParent;
+    private String deptName, deptPhone, deptLocal, deptParent, deptRemarks;
 
     public Department() {
     }

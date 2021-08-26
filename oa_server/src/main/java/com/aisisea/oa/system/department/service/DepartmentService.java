@@ -23,4 +23,6 @@ public interface DepartmentService {
 
     String queryDepartmentParentId(String deptId);
 
+    List<Department> queryDepartmentsByIds(List<String> deptIds);
+
 }

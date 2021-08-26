@@ -54,4 +54,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public String queryDepartmentParentId(String deptId) {
         return departmentMapper.selectDepartmentParentId(deptId);
     }
+
+    @Override
+    public List<Department> queryDepartmentsByIds(List<String> deptIds) {
+        return departmentMapper.selectDepartmentsByIds(deptIds);
+    }
 }

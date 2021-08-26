@@ -15,7 +15,12 @@
       <el-button type="primary" @click="batchVisible = true">批量添加</el-button>
       <el-button type="danger" @click="batchDelClick">批量删除</el-button>
       <el-button type="success" @click="refreshClick">刷新页面</el-button>
-      <el-button @click="refreshClick">批量导出</el-button>
+      <el-popover trigger="hover" v-model="exportVisible">
+        <el-switch v-model="exportAll" active-color="#409EFF" inactive-color="#67C23A"
+            active-text="导出全部" inactive-text="导出选中">
+        </el-switch>
+        <el-button class="popover-button" slot="reference" @click="exportClick">批量导出</el-button>
+      </el-popover>
       <el-input class="data-search" v-model="valueInput" placeholder="支持模糊查询" size="small" clearable>
         <el-select class="search-select" v-model="searchName" slot="prepend">
           <el-option label="部门名称" value="0"></el-option>
@@ -82,7 +87,9 @@ export default {
       selection: null,
       singleDlgType: 0,
       singleTitle: '',
-      sourceData: null
+      sourceData: null,
+      exportVisible: false,
+      exportAll: false
     }
   },
 
@@ -207,6 +214,28 @@ export default {
         this.deleteDepartments([this.tableData[index].deptId]);
     },
 
+    exportClick() {
+      let deptIds = [];
+      if (!this.exportAll) {
+        if (this.selection === undefined || this.selection === null || this.selection.length <= 0) {
+          this.$message.error("未选择任何内容！");
+          return;
+        } else this.selection.forEach(item => {
+          deptIds.push(item.deptId);
+        });
+      }
+      this.axios({
+        url: departmentApi.department.getXlsx,
+        method: 'POST',
+        data: deptIds,
+        responseType: 'blob'
+      }).then(res => {
+        if (res.status !== 200)
+          this.$message.error("系统错误");
+        Method.downloadFile(res);
+      });
+    },
+
     singleClose(isSuccess) {
       if (isSuccess)
         this.getDepartments(0);
@@ -247,6 +276,11 @@ export default {
     .search-select {
       width: 110px;
     }
+  }
+
+  .popover-button {
+    display: inline-block;
+    margin-left: 10px;
   }
 }
 

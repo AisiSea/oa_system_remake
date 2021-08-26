@@ -16,11 +16,11 @@
     </sql>
 
     <sql id="DeptColumnList">
-        d1.dept_id, d1.dept_name, d1.dept_phone, d1.dept_local, d1.dept_remarks, d2.dept_name
+        d1.dept_id, d1.dept_name, d1.dept_phone, d1.dept_local, d1.dept_remarks, d2.dept_name as dept_parent
     </sql>
 
     <select id="selectDepartmentsByKey" resultMap="BaseResultMap">
-        select <include refid="DeptColumnList"></include>, d2.dept_name as dept_parent
+        select <include refid="DeptColumnList"></include>
         from department as d1 inner join department as d2
         on d1.dept_parent = d2.dept_id
         <where>
@@ -49,6 +49,17 @@
 
     <select id="selectDepartmentParentId" resultType="java.lang.String">
         select dept_parent from department where dept_id = #{deptId}
+    </select>
+
+    <select id="selectDepartmentsByIds" resultMap="BaseResultMap">
+        select <include refid="DeptColumnList"></include>
+        from department as d1 inner join department as d2
+        ON d1.dept_parent = d2.dept_id
+        <where>
+            <if test="list != null">
+                d1.dept_id in (<foreach collection="list" item="id" separator=",">#{id}</foreach>)
+            </if>
+        </where>
     </select>
 
     <insert id="insertDepartments">
