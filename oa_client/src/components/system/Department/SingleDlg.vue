@@ -43,7 +43,7 @@ import departmentApi from "@/js/departmentApi";
 export default {
   name: "SingleDept",
 
-  props: ['singleDlgType', 'sourceData'],
+  props: ['singleDlgType', 'sourceData', 'deptNames'],
 
   data() {
     let checkDeptName = (rule, value, callback) => {
@@ -79,8 +79,6 @@ export default {
       },
       visible: false,
 
-      deptNames: [],
-
       deptRules: {
         deptName: [
           {required: true, message: '部门名不能为空', trigger: 'blur'},
@@ -102,9 +100,12 @@ export default {
   },
 
   mounted() {
-    this.selectVisible();
     if (this.sourceData !== undefined && this.sourceData !== null)
       this.department = Object.assign({}, this.sourceData);
+    if (this.singleDlgType === 1)
+      this.department.deptParent = this.deptNames.find(item => {
+        return item.deptName === this.sourceData.deptParent;
+      }).deptId;
   },
 
   methods: {
@@ -159,23 +160,6 @@ export default {
         } else return false;
       });
     },
-
-    selectVisible() {
-      this.axios({
-        method: 'POST',
-        url: departmentApi.department.getNames,
-        data: {},
-        async: false
-      }).then((res) => {
-        if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
-          this.deptNames = res.data.data.deptNames;
-          if (this.singleDlgType === 1)
-            this.department.deptParent = this.deptNames.find(item => {
-              return item.deptName === this.sourceData.deptParent;
-            }).deptId;
-        } else this.$message.error(res.data.msg);
-      });
-    }
   }
 
 };
