@@ -6,7 +6,8 @@ let departmentApi = {
         editDept: '/system/dept/put',
         delDept: '/system/dept/del',
         save: '/system/dept/post',
-        getXlsx: '/system/dept/get/xlsx'
+        getExcelByKeys: '/system/dept/get/excel/keys',
+        getExcelByIds: '/system/dept/get/excel/ids'
     }
 }
 export default departmentApi;

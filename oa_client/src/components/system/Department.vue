@@ -3,11 +3,15 @@
     <div class="data-dialog">
       <el-dialog :title="singleTitle" :visible.sync="singleVisible" :close-on-click-modal="false"
                  :close-on-press-escape="false" :show-close="false" v-if="singleVisible" append-to-body>
-        <SingleDlg @singleClose="singleClose" :singleDlgType="singleDlgType" :sourceData="sourceData"></SingleDlg>
+        <SingleDlg @singleClose="singleClose" :singleDlgType="singleDlgType" :sourceData="sourceData" :deptNames="deptNames"></SingleDlg>
       </el-dialog>
       <el-dialog title="批量添加部门" :visible.sync="batchVisible" :close-on-click-modal="false"
                  :close-on-press-escape="false" :show-close="false">
         <BatchDlg @batchClose="batchClose"></BatchDlg>
+      </el-dialog>
+      <el-dialog title="批量导出" :visible.sync="exportVisible" :close-on-click-modal="false"
+                 :close-on-press-escape="false" :show-close="false">
+        <ExportDlg @exportClose="exportClose" :deptNames="deptNames" :selection="selection"></ExportDlg>
       </el-dialog>
     </div>
     <div class="data-op">
@@ -15,12 +19,7 @@
       <el-button type="primary" @click="batchVisible = true">批量添加</el-button>
       <el-button type="danger" @click="batchDelClick">批量删除</el-button>
       <el-button type="success" @click="refreshClick">刷新页面</el-button>
-      <el-popover trigger="hover" v-model="exportVisible">
-        <el-switch v-model="exportAll" active-color="#409EFF" inactive-color="#67C23A"
-            active-text="导出全部" inactive-text="导出选中">
-        </el-switch>
-        <el-button class="popover-button" slot="reference" @click="exportClick">批量导出</el-button>
-      </el-popover>
+      <el-button class="popover-button" slot="reference" @click="exportClick">批量导出</el-button>
       <el-input class="data-search" v-model="valueInput" placeholder="支持模糊查询" size="small" clearable>
         <el-select class="search-select" v-model="searchName" slot="prepend">
           <el-option label="部门名称" value="0"></el-option>
@@ -60,11 +59,12 @@ import Method from "@/js/methods";
 import {mapState} from "vuex";
 import SingleDlg from "@/components/system/Department/SingleDlg";
 import BatchDlg from "@/components/system/Department/BatchDlg";
+import ExportDlg from "@/components/system/Department/ExportDlg";
 import departmentApi from "@/js/departmentApi";
 
 export default {
   name: "Department",
-  components: {SingleDlg, BatchDlg},
+  components: {ExportDlg, SingleDlg, BatchDlg},
   computed: {
     ...mapState(['TABLE_DEFAULT_HEIGHT', 'TABLE_EXTRA_SMALL_WIDTH', 'TABLE_BASE_WIDTH', 'TABLE_MEDIUM_WIDTH', 'TABLE_EXTRA_LARGE_WIDTH']),
   },
@@ -89,7 +89,7 @@ export default {
       singleTitle: '',
       sourceData: null,
       exportVisible: false,
-      exportAll: false
+      deptNames: [],
     }
   },
 
@@ -136,11 +136,25 @@ export default {
       this.axios({
         url: departmentApi.department.delDept,
         method: 'POST',
-        data: deptIds
+        data: deptIds,
+        async: false
       }).then(res => {
         if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
           this.$message.success(res.data.msg);
           this.getDepartments(this.currentPage, this.searchName, this.searchValue, this.orderCol, this.orderTy);
+        } else this.$message.error(res.data.msg);
+      });
+    },
+
+    getDepartmentsNames() {
+      this.axios({
+        method: 'POST',
+        url: departmentApi.department.getNames,
+        data: {},
+        async: false
+      }).then((res) => {
+        if (res.data.state === this.$store.state.SUCCESS_RESPONSE_STATE) {
+          this.deptNames = res.data.data.deptNames;
         } else this.$message.error(res.data.msg);
       });
     },
@@ -168,6 +182,7 @@ export default {
     },
 
     singleClick() {
+      this.getDepartmentsNames();
       this.singleTitle = '添加单个部门';
       this.singleDlgType = 0;
       this.sourceData = null;
@@ -175,6 +190,7 @@ export default {
     },
 
     editClick(index) {
+      this.getDepartmentsNames();
       this.singleTitle = '编辑部门';
       this.singleDlgType = 1;
       this.sourceData = this.tableData[index];
@@ -202,6 +218,7 @@ export default {
     },
 
     rowDblClick(row) {
+      this.getDepartmentsNames();
       this.singleTitle = '编辑部门';
       this.singleDlgType = 1;
       this.sourceData = row;
@@ -215,25 +232,8 @@ export default {
     },
 
     exportClick() {
-      let deptIds = [];
-      if (!this.exportAll) {
-        if (this.selection === undefined || this.selection === null || this.selection.length <= 0) {
-          this.$message.error("未选择任何内容！");
-          return;
-        } else this.selection.forEach(item => {
-          deptIds.push(item.deptId);
-        });
-      }
-      this.axios({
-        url: departmentApi.department.getXlsx,
-        method: 'POST',
-        data: deptIds,
-        responseType: 'blob'
-      }).then(res => {
-        if (res.status !== 200)
-          this.$message.error("系统错误");
-        Method.downloadFile(res);
-      });
+      this.getDepartmentsNames();
+      this.exportVisible = true;
     },
 
     singleClose(isSuccess) {
@@ -244,6 +244,10 @@ export default {
 
     batchClose() {
       this.batchVisible = false;
+    },
+
+    exportClose() {
+      this.exportVisible = false;
     }
   }
 }
