@@ -35,18 +35,18 @@ export default {
     },
 
     downloadFile(res) {
-        const stream = res.data;                        // 后端用stream返回Excel文件
-        const blob = new Blob([stream]);
-        const href = window.URL.createObjectURL(blob);  // 创建下载的链接
-        const nameStr = res.headers["content-disposition"].split(";")[1].split("filename=")[1];
-        const downloadElement = document.createElement('a');
+        let blob = new Blob([res.data],  { type: 'application/octet-stream;charset=utf-8' });
+        let href = window.URL.createObjectURL(blob);  // 创建下载的链接
+        let nameStr = res.headers["content-disposition"].split(";")[1].split("filename=")[1];
+        let downloadElement = document.createElement('a');
 
         downloadElement.href = href;
-        downloadElement.download = nameStr;             // 下载后文件名
+        downloadElement.download = decodeURI(nameStr);             // 下载后文件名
         document.body.appendChild(downloadElement);
         downloadElement.click();                        // 点击下载
 
         document.body.removeChild(downloadElement);     // 下载完成移除元素
         window.URL.revokeObjectURL(href);               // 释放掉blob对象
-    }
+    },
+
 }
