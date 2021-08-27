@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-divider></el-divider>
-    <div class="add-op">
+    <div class="dlg-op">
       <el-button type="warning" @click="cancelClick">取消</el-button>
       <el-button type="primary" @click="okClick">保存</el-button>
     </div>
@@ -29,7 +29,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.add-op {
+.dlg-op {
   display: flex;
   justify-content: flex-end;
 }
