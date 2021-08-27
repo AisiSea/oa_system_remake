@@ -62,6 +62,23 @@
         </where>
     </select>
 
+    <select id="selectDepartmentsByKeys" resultMap="BaseResultMap">
+        select <include refid="DeptColumnList"></include>
+        from department as d1 inner join department as d2
+        ON d1.dept_parent = d2.dept_id
+        <where>
+            <if test="deptName != null and deptName != ''">
+                d1.dept_name like concat('%', #{deptName}, '%')
+            </if>
+            <if test="deptParent != null and deptParent != ''">
+                and d1.dept_parent like concat('%', #{deptParent}, '%')
+            </if>
+            <if test="deptLocal != null and deptLocal != ''">
+                and d1.dept_local like concat('%', #{deptLocal}, '%')
+            </if>
+        </where>
+    </select>
+
     <insert id="insertDepartments">
         insert into department(<include refid="InsertColumnList"></include>) values
         <foreach collection="list" item="d" separator=",">

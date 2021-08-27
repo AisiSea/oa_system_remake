@@ -25,4 +25,6 @@ public interface DepartmentService {
 
     List<Department> queryDepartmentsByIds(List<String> deptIds);
 
+    List<Department> queryDepartmentsByKeys(Department department);
+
 }

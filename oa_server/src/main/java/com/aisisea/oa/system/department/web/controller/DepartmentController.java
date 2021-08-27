@@ -210,13 +210,22 @@ public class DepartmentController {
         return true;
     }
 
-    @RequestMapping(value = "/system/dept/get/xlsx", method = RequestMethod.POST)
+    @RequestMapping(value="/system/dept/get/excel/keys", method = RequestMethod.POST)
+    public void queryDepartmentsToExcel(@RequestBody Department department, HttpServletResponse response) {
+        List<Department> list = departmentService.queryDepartmentsByKeys(department);
+        createExcel(list, response);
+    }
+
+    @RequestMapping(value = "/system/dept/get/excel/ids", method = RequestMethod.POST)
     public void queryDepartmentsToExcel(@RequestBody List<String> deptIds, HttpServletResponse response) {
         List<Department> list;
         if (deptIds != null && deptIds.size() > 0)
             list = departmentService.queryDepartmentsByIds(deptIds);
         else list = departmentService.queryDepartmentsByIds(null);
+        createExcel(list, response);
+    }
 
+    public void createExcel(List<Department> list, HttpServletResponse response) {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("部门导出表");
 
@@ -231,6 +240,7 @@ public class DepartmentController {
             if (name.equals("deptId"))
                 iterator.remove();
             else {
+                sheet.setColumnWidth(columnIndex, 5000);
                 XSSFCell cell = titleRow.createCell(columnIndex);
                 cell.setCellValue(ParamTranslationMap.DEPT.get(name));
                 columnIndex++;
@@ -251,7 +261,7 @@ public class DepartmentController {
             }
 
             response.setContentType("application/octet-stream;charset=UTF-8");
-            String fileName = URLEncoder.encode("市场活动表.xlsx", "UTF-8");
+            String fileName = URLEncoder.encode("部门导出表.xlsx", "UTF-8");
             response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
             outputStream = response.getOutputStream();
             workbook.write(outputStream);

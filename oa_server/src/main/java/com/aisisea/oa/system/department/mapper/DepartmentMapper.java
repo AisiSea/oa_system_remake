@@ -24,4 +24,6 @@ public interface DepartmentMapper {
     String selectDepartmentParentId(String deptId);
 
     List<Department> selectDepartmentsByIds(List<String> deptIds);
+
+    List<Department> selectDepartmentsByKeys(Department department);
 }

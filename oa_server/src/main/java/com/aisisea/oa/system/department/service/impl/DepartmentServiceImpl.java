@@ -59,4 +59,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public List<Department> queryDepartmentsByIds(List<String> deptIds) {
         return departmentMapper.selectDepartmentsByIds(deptIds);
     }
+
+    @Override
+    public List<Department> queryDepartmentsByKeys(Department department) {
+        return departmentMapper.selectDepartmentsByKeys(department);
+    }
 }
